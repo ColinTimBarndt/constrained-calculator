@@ -16,4 +16,5 @@ export default defineConfig({
     sourcemap: true,
   },
   appType: "mpa",
+  base: "/constrained-calculator/",
 });
