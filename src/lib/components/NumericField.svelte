@@ -48,6 +48,7 @@ An input field for a numeric value used for the constraint system.
   $effect(() => {
     if (value === currentValue) return;
     textValue = formatUnitValue(value);
+    inputEl?.setCustomValidity("");
   });
 
   function oninput(event: Event) {
