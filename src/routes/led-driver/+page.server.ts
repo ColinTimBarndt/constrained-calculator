@@ -12,7 +12,9 @@ export const load: PageServerLoad = ({ params }) => {
   const render = (tex: string) => katex.renderToString(tex, katexOptions);
 
   return {
+    // We only render katex on the server side to avoid bundling katex, which is a large library.
     katex: {
+      // NAME~\left[UNIT\right]
       v_in: render(String.raw`V_{IN}~\left[\text{V}\right]`),
       v_led: render(String.raw`V_{LED}~\left[\text{V}\right]`),
       i_led: render(String.raw`I_{LED}~\left[\text{A}\right]`),

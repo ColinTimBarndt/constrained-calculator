@@ -182,7 +182,7 @@
         highlight={form.highlighted.has(name)}
         icon={params.icon}
         onfocus={() => {form.highlightChangesOf = name}}
-        onblur={() => {form.highlightChangesOf = ""}}
+        onblur={() => {form.highlightChangesOf = undefined}}
         onchange={() => form.recomputeForChange(name)}
       />
     </td>

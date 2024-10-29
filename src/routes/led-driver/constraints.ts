@@ -1,10 +1,22 @@
 import { Constraint, ConstraintFormula } from "$lib/constraints";
 import * as mathjs from "mathjs";
 
+/**
+ * All constraints for an LED Driver.
+ *
+ * This is based on the specification of the `AL8861` LED Driver IC by Diodes Incorporated.
+ *
+ * @see https://www.diodes.com/assets/Datasheets/AL8861.pdf
+ * @see https://www.mouser.com/datasheet/2/115/AL8861-1094677.pdf
+ */
 const constraints: ReadonlySet<Constraint> = Object.freeze(createConstraints());
 
 export default constraints;
 
+/**
+ * @see module default export.
+ * @returns The constraints.
+ */
 function createConstraints() {
   const constraints = new Set<Constraint>();
 

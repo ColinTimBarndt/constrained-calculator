@@ -9,11 +9,29 @@ import type { Unit } from "mathjs";
 const EMPTY: ReadonlySet<any> = Object.freeze(new Set());
 
 export class ConstrainedForm {
-  #constraints: ConstraintSet = $state.raw(new ConstraintSet());
+  /**
+   * The constraints for this form that need to be maintained.
+   */
+  public constraints: ConstraintSet = $state(new ConstraintSet());
+
+  /**
+   * The values of all form fields.
+   */
   public readonly values: Partial<Record<string, Unit>> = $state({});
+
+  /**
+   * The locked state of all form fields.
+   */
   public readonly locked: Partial<Record<string, boolean>> = $state({});
+
+  /**
+   * For which field to highlight which other fields would change, if any.
+   */
   public highlightChangesOf: string | undefined = $state();
 
+  /**
+   * Readonly set of fields which have been locked by the user.
+   */
   public readonly lockedSet: ReadonlySet<string> = $derived(
     new Set(
       Object.entries(this.locked)
@@ -22,6 +40,9 @@ export class ConstrainedForm {
     )
   );
 
+  /**
+   * Formulas for each field to apply to maintain all constraints. If not possible (`null`), the field is in the {@link disabled} set.
+   */
   #computations: Partial<
     Record<
       string,
@@ -32,12 +53,18 @@ export class ConstrainedForm {
     >
   > = $state.raw({});
 
+  /**
+   * The readonly set of all fields that should be highlighted.
+   */
   public readonly highlighted: ReadonlySet<string> = $derived(
     (this.highlightChangesOf &&
       this.#computations[this.highlightChangesOf]?.changes) ||
       EMPTY
   );
 
+  /**
+   * The readonly set of all fields that should be disabled.
+   */
   public readonly disabled: ReadonlySet<string> = $derived(
     new Set(
       Object.entries(this.#computations)
@@ -46,6 +73,12 @@ export class ConstrainedForm {
     )
   );
 
+  /**
+   * Creates a form and initializes the state for each field.
+   *
+   * @param constraints - The constraints for this form.
+   * @param init - Initialization options for each field (needed for rendering).
+   */
   public constructor(
     constraints: Iterable<Constraint>,
     init: Iterable<{
@@ -55,7 +88,7 @@ export class ConstrainedForm {
       recompute?: boolean;
     }>
   ) {
-    this.#constraints = new ConstraintSet(constraints);
+    this.constraints = new ConstraintSet(constraints);
 
     const recomputeSet = new Set<string>();
 
@@ -75,10 +108,11 @@ export class ConstrainedForm {
     }
 
     $effect(() => {
+      // Updates the computation steps needed to fulfill all constraints when the respective field changes.
       this.#computations = Object.fromEntries(
         Object.keys(this.values).map((name) => {
           try {
-            const steps = this.#constraints.solve(
+            const steps = this.constraints.solve(
               new Set([name]),
               this.lockedSet
             );
@@ -97,13 +131,11 @@ export class ConstrainedForm {
     });
   }
 
-  get constraints() {
-    return new ConstraintSet(this.#constraints);
-  }
-  set constraints(val) {
-    this.#constraints = val;
-  }
-
+  /**
+   * Applies all steps and updates the field values accordingly.
+   *
+   * @param steps Formulas to evaluate.
+   */
   applySteps(steps: ConstraintFormula[]) {
     let state = { ...this.values } as Record<string, Unit>;
     const changed = new Set<string>();
@@ -120,6 +152,13 @@ export class ConstrainedForm {
     }
   }
 
+  /**
+   * A field has changed and other fields need to be changed to maintain the constraints.
+   *
+   * Call this function when a field changes (`oninput`).
+   *
+   * @param fieldName The field that has changed.
+   */
   recomputeForChange(fieldName: string) {
     const steps = this.#computations[fieldName]?.steps;
     if (!steps) throw new Error(`No computation for field ${fieldName}`);
