@@ -1,34 +1,9 @@
+import { Constraint, ConstraintFormula } from "$lib/constraints";
 import * as mathjs from "mathjs";
-import { Constraint, ConstraintFormula } from "../lib/constraints.js";
-import { Form } from "../lib/form.js";
 
-type Fields =
-  | "v_in"
-  | "r_l"
-  | "v_d"
-  | "v_led"
-  | "i_led"
-  | "r_s"
-  | "l"
-  | "v_s"
-  | "ripple_mult"
-  | "ripple"
-  | "r_lx"
-  | "t_on"
-  | "t_off"
-  | "d"
-  | "f_sw";
+const constraints: ReadonlySet<Constraint> = Object.freeze(createConstraints());
 
-interface Forms {
-  form: Form<Fields>;
-}
-
-export function init(_: HTMLElement, { form }: Forms) {
-  form.setConstraints(createConstraints());
-  form.computeFields(
-    new Set(["i_led", "ripple", "t_on", "t_off", "d", "f_sw"])
-  );
-}
+export default constraints;
 
 function createConstraints() {
   const constraints = new Set<Constraint>();

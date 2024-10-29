@@ -1,6 +1,8 @@
 import * as mathjs from "mathjs";
+import { UNIT } from "./units.js";
 
 const DEBUG_ASSERTIONS = true;
+const DEBUG_SOLVE = false;
 
 export class ConstraintFormula<
   D extends string = string,
@@ -8,12 +10,12 @@ export class ConstraintFormula<
 > {
   public readonly compute: (
     deps: Record<D, mathjs.Unit>
-  ) => Record<C, mathjs.Unit | number>;
+  ) => Record<C, mathjs.Unit>;
 
   private constructor(
     public readonly dependencies: ReadonlySet<D>,
     public readonly computes: ReadonlySet<C>,
-    compute: (deps: Record<D, mathjs.Unit>) => Record<C, mathjs.Unit | number>,
+    compute: (deps: Record<D, mathjs.Unit>) => Record<C, mathjs.Unit>,
     public readonly priority: number = 0
   ) {
     Object.freeze(this.dependencies);
@@ -78,15 +80,26 @@ export class ConstraintFormula<
       return new this(
         new Set(dependencies),
         new Set([computes]),
-        (deps) =>
-          ({ [computes]: compute(deps) } as Record<C, mathjs.Unit | number>),
+        (deps) => {
+          let val = (compute as any)(deps);
+          if (typeof val == "number") val = mathjs.unit(val, UNIT.NONE as any);
+          return { [computes]: val } as Record<C, mathjs.Unit>;
+        },
         priority
       );
     }
     return new this(
       new Set(dependencies),
       new Set(computes),
-      compute as any,
+      (deps) => {
+        const result = (compute as any)(deps);
+        for (const name of result) {
+          const val = result[name];
+          if (typeof val == "number")
+            result[name] = mathjs.unit(val, UNIT.NONE as any);
+        }
+        return result;
+      },
       priority
     );
   }
@@ -186,7 +199,7 @@ export class Constraint<D extends string = string> {
 
 type Num = mathjs.Unit | number;
 
-abstract class ConstraintError extends Error {}
+export abstract class ConstraintError extends Error {}
 
 class OverconstrainedError extends ConstraintError {
   constructor(public constraint: Constraint) {
@@ -242,7 +255,7 @@ export class ConstraintSet extends Set<Constraint> {
   ): ConstraintFormula[];
   public solve(changed: ReadonlySet<string>, fixed: ReadonlySet<string>) {
     let stepCountdowm = 1000;
-    console.groupCollapsed("Solve", changed);
+    if (DEBUG_SOLVE) console.groupCollapsed("Solve", changed);
     try {
       return step(
         new Set([...this].filter((it) => !it.fields.isDisjointFrom(changed))),
@@ -252,7 +265,7 @@ export class ConstraintSet extends Set<Constraint> {
         this
       );
     } finally {
-      console.groupEnd();
+      if (DEBUG_SOLVE) console.groupEnd();
     }
 
     function step(
@@ -268,7 +281,7 @@ export class ConstraintSet extends Set<Constraint> {
       }
       if (constraints.size == 0) return apply;
 
-      console.debug("Step", constraints, fixed);
+      if (DEBUG_SOLVE) console.debug("Step", constraints, fixed);
 
       let errors: Error[] = [];
       for (const constraint of constraints) {
@@ -290,19 +303,12 @@ export class ConstraintSet extends Set<Constraint> {
         remConstraints: Set<Constraint>
       ) {
         if (fulfilled.has(constraint)) {
-          console.debug("Skip", constraint.name);
+          if (DEBUG_SOLVE) console.debug("Skip", constraint.name);
           return step(remConstraints, fixed, apply, fulfilled, pool);
         }
 
         if (constraint.fields.isSubsetOf(fixed)) {
           throw new OverconstrainedError(constraint);
-          return step(
-            remConstraints,
-            fixed,
-            apply,
-            new Set([...fulfilled, constraint]),
-            pool
-          );
         }
 
         const formulas = [...constraint.applicableFormulas(fixed)];
@@ -343,7 +349,13 @@ export class ConstraintSet extends Set<Constraint> {
 
         for (const formula of formulas) {
           try {
-            console.group("Compute", formula.computes, "with", constraint.name);
+            if (DEBUG_SOLVE)
+              console.group(
+                "Compute",
+                formula.computes,
+                "with",
+                constraint.name
+              );
             const newPool = setWithout(pool, constraint);
             return step(
               setWithout(remConstraints, constraint).union(
@@ -361,7 +373,7 @@ export class ConstraintSet extends Set<Constraint> {
             if (!(e instanceof ConstraintError)) throw e;
             errors.push(e);
           } finally {
-            console.groupEnd();
+            if (DEBUG_SOLVE) console.groupEnd();
           }
         }
 

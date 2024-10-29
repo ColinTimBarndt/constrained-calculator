@@ -1,7 +1,7 @@
 {
+    "extends": "./.svelte-kit/tsconfig.json",
     "compilerOptions": {
-        "module": "Node16",
-        "moduleResolution": "Node16",
+        "moduleResolution": "Bundler",
         "target": "ESNext",
         "outDir": "dist",
         "rootDir": "src",

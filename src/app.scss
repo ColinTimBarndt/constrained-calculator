@@ -1,0 +1,31 @@
+@use "./icons.scss";
+
+:root {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --color-invalid: #c81b55;
+    --color-bg: #283336;
+    --color-accent: #1ba3c8;
+    --color-accent2: #c85a1b;
+    --color-input-outline: #616c70;
+    --color-input-outline-inactive: #4f575a;
+    --color-interactive: #3f494d;
+    --color-interactive-active: #49565a;
+    --color-text: #eee;
+}
+
+html {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    color: var(--color-accent);
+}
+
+math[display=block] {
+    margin-block: 1rem;
+}
