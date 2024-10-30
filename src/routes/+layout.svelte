@@ -3,6 +3,7 @@
   import Navigation from "$components/Navigation.svelte";
   import NavItem from "$components/NavItem.svelte";
   import NavGroup from "$components/NavGroup.svelte";
+  import { base } from "$app/paths";
 </script>
 
 <div class="layout">
@@ -13,9 +14,9 @@
 
   <aside>
     <Navigation>
-      <NavItem href="/">Home</NavItem>
+      <NavItem href={base}>Home</NavItem>
       <NavGroup name="Electronics">
-        <NavItem href="/led-driver">LED Driver</NavItem>
+        <NavItem href="{base}/led-driver">LED Driver</NavItem>
         <NavItem disabled>555 Timer (ToDo)</NavItem>
       </NavGroup>
     </Navigation>
