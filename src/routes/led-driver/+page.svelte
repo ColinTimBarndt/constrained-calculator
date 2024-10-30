@@ -11,6 +11,10 @@
   const form = new ConstrainedForm(constraints, fields.values());
 </script>
 
+<svelte:head>
+  <title>LED Driver Calculator</title>
+</svelte:head>
+
 <h2>LED Driver Calculator</h2>
 
 <form>

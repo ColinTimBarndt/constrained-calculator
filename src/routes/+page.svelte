@@ -1,3 +1,7 @@
+<svelte:head>
+  <title>Constrained Calculator</title>
+</svelte:head>
+
 <h2>Constrained Calculator</h2>
 
 <p>
