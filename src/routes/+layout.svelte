@@ -34,12 +34,12 @@
     align-items: stretch;
 
     > h1 {
+      margin: 0;
       padding-block: 0.5rem;
       line-height: 1;
       font-weight: normal;
-      width: 16rem;
+      width: calc(16rem - var(--border-width));
       text-align: center;
-      margin: 0;
       background: var(--color-bg-dark);
     }
 
@@ -71,14 +71,15 @@
       grid-template-areas: "header header" "sidebar main";
     }
 
+    header > h1 {
+      padding-block: calc(0.5rem - 0.5 * var(--border-width));
+      margin-bottom: var(--border-width);
+    }
+
     aside {
       grid-area: sidebar;
       border-inline-end: var(--border-width) solid
         var(--color-input-outline-inactive);
-    }
-
-    header .filler {
-      margin-left: calc(-1 * var(--border-width));
     }
   }
 </style>
