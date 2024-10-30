@@ -28,6 +28,7 @@ $icons: (
   background-image: url(./icons_64.png);
   background-repeat: no-repeat;
   background-size: 800%;
+  background-position: (icon-position(63));
 
   @each $name in map.keys($icons) {
     &.i-#{$name} {

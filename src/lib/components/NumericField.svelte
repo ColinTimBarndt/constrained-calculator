@@ -101,9 +101,9 @@ An input field for a numeric value used for the constraint system.
   }
 </script>
 
-<fieldset class={highlight ? "highlight" : ""}>
+<fieldset class:highlight>
   {#if icon}
-    <i class={"icon i-" + icon}></i>
+    <i class="icon i-{icon}"></i>
   {/if}
   <input
     class="text"
@@ -120,7 +120,9 @@ An input field for a numeric value used for the constraint system.
     }}
   />
   <input
-    class={"lock icon " + (locked ? "i-locked" : "i-unlocked")}
+    class="lock icon"
+    class:i-locked={locked}
+    class:i-unlocked={!locked}
     id={id + ".locked"}
     bind:checked={locked}
     type="checkbox"
@@ -131,13 +133,13 @@ An input field for a numeric value used for the constraint system.
 <style lang="scss">
   $width: 12rem;
   $height: 2rem;
-  $border: 2px;
-  $radius: 4px;
+  $border: var(--border-width);
+  $radius: calc(2 * $border);
   $radius-inner: calc($radius - $border);
 
   fieldset {
     display: inline-flex;
-    border: 2px solid var(--color-input-outline);
+    border: $border solid var(--color-input-outline);
     margin: 0;
     padding: 0;
     width: $width;
