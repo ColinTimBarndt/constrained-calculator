@@ -14,7 +14,7 @@
 
   <aside>
     <Navigation>
-      <NavItem href={base}>Home</NavItem>
+      <NavItem href="{base}/">Home</NavItem>
       <NavGroup name="Electronics">
         <NavItem href="{base}/led-driver">LED Driver</NavItem>
         <NavItem disabled>555 Timer (ToDo)</NavItem>
