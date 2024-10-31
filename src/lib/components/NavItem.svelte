@@ -11,10 +11,6 @@
   const {href, disabled, children}: Props = $props();
 
   const current = $derived($page.url.pathname == href);
-
-  $effect(() => {
-    console.log($page.url.pathname, href);
-  });
 </script>
 
 <li class:disabled><a href={current ? null : href} class:current>{@render children()}</a></li>
