@@ -1,38 +1,104 @@
 @use "sass:math";
 @use "sass:map";
 
-$icons: (
-  voltage: 0,
-  current: 1,
-  resistor: 2,
-  capacitor: 3,
-  inductor: 4,
-  diode: 5,
-  transistor: 6,
-  voltage-ripple: 8,
-  current-ripple: 9,
-  time: 10,
-  pwm: 11,
-  unlocked: 16,
-  locked: 17,
-);
-
-@function icon-position($id) {
-  $x: ($id % 8 * math.div(100%, 7));
-  $y: (math.floor(math.div($id, 8)) * math.div(100%, 7));
-  @return $x $y;
+@font-face {
+  font-family: cocalc-icon;
+  src: url("./fonts/cocalc-icon.woff2") format("woff2"),
+       url("./fonts/cocalc-icon.woff") format("woff"),
+       url(./fonts/cocalc-icon.ttf) format("truetype");
 }
 
+$glyphs: (
+  voltage: "\e000",
+  current-body: "\e001",
+  current-dial: "\e002",
+  ripple-v: "\e003",
+  ripple-h: "\e004",
+  ripple-d: "\e005",
+  wire-a: "\e006",
+  wire-l1: "\e007",
+  wire-l2: "\e008",
+  wire-l3: "\e009",
+  resistor: "\e00a",
+  capacitor: "\e00b",
+  inductor: "\e00c",
+  diode: "\e00d", // TODO
+  led: "\e00e",
+  transistor: "\e00f",
+  time-body: "\e010",
+  time-dial: "\e011",
+  pwm: "\e012",
+  lock-body: "\e100",
+  lock-unlocked: "\e101",
+  lock-locked: "\e102",
+);
+
+$icons: (
+  voltage: (voltage: color),
+  current: (current-dial: white, current-body: color),
+  resistor: (wire-a: white, resistor: color),
+  capacitor: (wire-l2: white, capacitor: color),
+  inductor: (wire-a: white, inductor: color),
+  diode: (wire-l2: white, led: color), // TODO: change to actual diode glyph when made
+  led: (wire-l2: white, led: color),
+  transistor: (wire-l3: white, transistor: color),
+  voltage-ripple: (ripple: color, ripple-h: white),
+  current-ripple: (current-dial: white, current-body: color, ripple-v: white),
+  time: (time-dial: white, time-body: color),
+  pwm: (pwm: color),
+  unlocked: (lock-unlocked: white, lock-body: color),
+  locked: (lock-locked: white, lock-body: color),
+);
+
 .icon {
+  --color: var(--color-accent);
+  --size: 1rem;
+  --w: "";
+  --c: "";
+  position: relative;
+  font: var(--size) cocalc-icon;
+  height: var(--size);
+  line-height: 1;
   aspect-ratio: 1;
-  background-image: url(./icons_64.png);
-  background-repeat: no-repeat;
-  background-size: 800%;
-  background-position: (icon-position(63));
+  text-rendering: geometricPrecision;
+
+  &::before, &::after {
+    position: absolute;
+    display: block;
+    inset: 0;
+    user-select: none;
+  }
+
+  &::before {
+    content: var(--w);
+    color: white;
+  }
+
+  &::after {
+    content: var(--c);
+    color: var(--color);
+  }
 
   @each $name in map.keys($icons) {
+    $parts: map.get($icons, $name);
     &.i-#{$name} {
-      background-position: (icon-position(map.get($icons, $name)));
+      $w: "";
+      $c: "";
+
+      @each $glyph in map.keys($parts) {
+        $char: map.get($glyphs, $glyph);
+        $category: map.get($parts, $glyph);
+
+        @if $category == white {
+          $w: $w + $char;
+        }
+        @if $category == "color" {
+          $c: $c + $char;
+        }
+      }
+
+      --w: "#{$w}";
+      --c: "#{$c}";
     }
   }
 }

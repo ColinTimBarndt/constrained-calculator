@@ -2,6 +2,7 @@
 @component
 An input field for a numeric value used for the constraint system.
 -->
+
 <script lang="ts">
   import * as math from "mathjs";
   import type { Unit } from "mathjs";
@@ -112,7 +113,7 @@ An input field for a numeric value used for the constraint system.
     bind:this={inputEl}
     type="text"
     {oninput}
-    disabled={disabled || locked}
+    {disabled}
     {onfocus}
     onblur={() => {
       reformat();
@@ -136,6 +137,7 @@ An input field for a numeric value used for the constraint system.
   $border: var(--border-width);
   $radius: calc(2 * $border);
   $radius-inner: calc($radius - $border);
+  $inner-height: calc($height - 2 * $border);
 
   fieldset {
     display: inline-flex;
@@ -163,11 +165,14 @@ An input field for a numeric value used for the constraint system.
     &:has(> .text:invalid) {
       border-color: var(--color-invalid);
     }
+
+    > * {
+      --size: #{$inner-height};
+    }
   }
 
   i {
     display: inline-block;
-    height: 100%;
     position: absolute;
     pointer-events: none;
 
@@ -212,6 +217,10 @@ An input field for a numeric value used for the constraint system.
     &:active,
     &:hover:not(:disabled) {
       background-color: var(--color-interactive-active);
+    }
+
+    &:checked {
+      --color: var(--color-accent2);
     }
 
     &:disabled {
